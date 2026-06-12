@@ -26,41 +26,29 @@
   #beltGlide { position:absolute; z-index:8; pointer-events:none;
     background:repeating-linear-gradient(90deg, #ffffff14 0 12px, #ffffff00 12px 120px); }
 
-  /* ── 카테고리 상자 (골판지 박스) ── */
-  .bin { position:absolute; border-radius:8px; z-index:20;
-    border:4px solid #2b2b2b;
-    background:
-      repeating-linear-gradient(90deg, #ffffff10 0 4px, #00000000 4px 64px),
-      linear-gradient(#dcae72,#cf9d5d);
-    box-shadow:0 6px 0 #00000022, inset 0 3px 0 #ffffff2e;
-    transition:transform .12s ease, box-shadow .12s ease; }
-  .bin .flap { position:absolute; left:-4px; right:-4px; top:-16px; height:20px;
-    background:linear-gradient(#c89254,#b98343); border:4px solid #2b2b2b; border-radius:8px 8px 2px 2px; }
-  .bin .tape { position:absolute; left:50%; top:-16px; bottom:0; transform:translateX(-50%); width:46px;
-    background:var(--c); opacity:.9;
-    border-left:3px solid #00000026; border-right:3px solid #00000026; }
-  .bin .label { position:absolute; left:50%; bottom:14px; transform:translateX(-50%) rotate(-1.5deg);
-    background:#fdf8ec; color:var(--d); border:3px solid #2b2b2b; border-radius:8px;
-    padding:3px 14px; font-size:22px; font-weight:800; letter-spacing:1px; white-space:nowrap;
-    box-shadow:0 3px 0 #00000026; }
-  .bin.hover { transform:scale(1.06); box-shadow:0 0 0 5px var(--c), 0 8px 20px #00000044; }
+  /* ── 카테고리 박스 (일러스트 에셋) ── */
+  .bin { position:absolute; z-index:20; background-size:contain; background-position:center bottom;
+    background-repeat:no-repeat; transition:transform .12s ease, filter .12s ease; }
+  .bin.hover { transform:scale(1.07); filter:drop-shadow(0 0 14px #ffd94e) brightness(1.06); }
   .bin.pop { animation:binPop .35s ease; }
   @keyframes binPop { 30% { transform:scale(1.12); } 100% { transform:scale(1); } }
   .bin.wrong { animation:binWrong .4s ease; }
   @keyframes binWrong {
-    0%,100% { transform:translateX(0); box-shadow:0 0 0 5px #ff3b3bcc; }
+    0%,100% { transform:translateX(0); filter:drop-shadow(0 0 10px #ff3b3b); }
     25% { transform:translateX(-10px); } 50% { transform:translateX(9px); } 75% { transform:translateX(-6px); }
   }
 
-  /* ── 단어 태그 ── */
-  .item { position:absolute; left:0; top:0; z-index:30; padding:7px 18px 7px 26px;
-    background:linear-gradient(#faf2dc,#f0e3c2); border:4px solid #2b2b2b; border-radius:10px;
-    font-family:'Patrick Hand','Comic Sans MS',sans-serif; font-size:31px; font-weight:400;
-    color:#2b2b2b; letter-spacing:.5px; white-space:nowrap;
-    box-shadow:0 6px 0 #00000026, inset 0 2px 0 #ffffff8c; cursor:grab; will-change:transform; }
-  .item::before { content:''; position:absolute; left:9px; top:50%; margin-top:-5px;
-    width:8px; height:8px; border-radius:50%; background:#2b2b2b; box-shadow:inset 0 1px 2px #000; }
-  .item.drag { cursor:grabbing; z-index:50; box-shadow:0 20px 26px #00000040, inset 0 2px 0 #ffffff8c; }
+  /* ── 아이템: 과일 + 단어 라벨 ── */
+  .item { position:absolute; left:0; top:0; z-index:30; cursor:grab; will-change:transform;
+    display:flex; flex-direction:column; align-items:center; gap:1px; }
+  .item .fruit { width:94px; height:94px; object-fit:contain; pointer-events:none;
+    filter:drop-shadow(0 6px 6px #00000030); }
+  .item .wlabel { background:#fdf8ec; border:3px solid #2b2b2b; border-radius:9px;
+    padding:1px 13px; font-family:'Patrick Hand','Comic Sans MS',sans-serif; font-size:27px;
+    color:#2b2b2b; white-space:nowrap; pointer-events:none;
+    box-shadow:0 3px 0 #00000022; }
+  .item.drag { cursor:grabbing; z-index:50; }
+  .item.drag .fruit { filter:drop-shadow(0 18px 16px #00000038); }
 
   /* ── 이펙트 캔버스 / 플로터 ── */
   #fx { position:absolute; inset:0; z-index:60; pointer-events:none; }
@@ -70,9 +58,9 @@
   @keyframes floatUp { 0% { opacity:0; margin-top:8px; } 12% { opacity:1; margin-top:0; }
     100% { opacity:0; margin-top:-78px; } }
 
-  /* ── HUD (중간 띠 — 벨트와 상자 사이 빈 바닥) ── */
+  /* ── HUD (하단 띠) ── */
   #hud { position:absolute; inset:0; z-index:70; pointer-events:none; }
-  #hearts { position:absolute; left:40px; top:432px; display:flex; gap:8px; }
+  #hearts { position:absolute; left:40px; top:660px; display:flex; gap:8px; }
   .heart { width:32px; height:30px; position:relative; transition:filter .2s, transform .2s;
     filter:drop-shadow(0 2px 0 #2b2b2b55); }
   .heart::before, .heart::after { content:''; position:absolute; width:18px; height:28px;
@@ -80,12 +68,12 @@
   .heart::before { left:8px; transform:rotate(-45deg); transform-origin:0 100%; }
   .heart::after { left:-2px; transform:rotate(45deg); transform-origin:100% 100%; }
   .heart.off { filter:grayscale(1) brightness(.45); transform:scale(.82); }
-  #scoreBox { position:absolute; right:46px; top:418px; text-align:right; }
+  #scoreBox { position:absolute; right:46px; top:628px; text-align:right; }
   #score { font-size:44px; font-weight:800; color:#2b2b2b; text-shadow:0 2px 0 #ffffff80; }
   #score.punch { animation:scorePunch .25s ease; }
   @keyframes scorePunch { 40% { transform:scale(1.22); } 100% { transform:scale(1); } }
   #combo { font-size:22px; font-weight:800; color:#c8780f; min-height:28px; text-shadow:0 2px 0 #ffffff80; }
-  #timer { position:absolute; left:50%; top:420px; transform:translateX(-50%);
+  #timer { position:absolute; left:50%; top:644px; transform:translateX(-50%);
     font-size:38px; font-weight:800; color:#2b2b2b;
     background:#ffd94e; border:3px solid #2b2b2b; border-radius:10px; padding:0 22px;
     box-shadow:0 4px 0 #00000026; }
@@ -132,21 +120,22 @@
 'use strict';
 /* =====================================================================
    WORD FACTORY — 컨베이어 단어 분류 게임 (배경: assets/bg.png)
-   벨트 좌→우. 못 옮긴 단어는 우측 끝에서 TRASH로 자동 낙하.
-   데이터·좌표는 아래 상단 블록에서만 수정 (배경 교체 시 숫자만 변경)
+   벨트 좌→우. 과일에 단어 라벨이 매달려 흐름.
+   3개 박스(Looking/Gathering/Mixing)에 분류, 어디에도 안 맞는 단어는
+   건드리지 않고 우측 끝 TRASH로 흘려보내야 정답.
+   데이터·좌표는 아래 상단 블록에서만 수정 (배경·에셋 교체 시 숫자만 변경)
    ===================================================================== */
 
 // ── 레이아웃 좌표 (1280x720 디자인 기준, bg.png에 맞춤) ──
 const LAYOUT = {
   stage : { w:1280, h:720 },
-  belt  : { spawnX:-70, xEnd:977, itemY:150,           // 좌측 스폰 → 우측 끝, itemY=벨트면 중앙
+  belt  : { spawnX:-70, xEnd:977, itemY:158,           // 좌측 스폰 → 우측 끝, itemY=아이템 중심
             face:{ x:0, y:93, w:977, h:140 } },        // 구동 연출 오버레이 영역
   trash : { x:1005, y:170, w:255, h:212, catchY:285, cx:1132 },  // 자동 낙하 수거 영역
-  bins  : [                                            // 카테고리 순서대로 매핑 (하단 4개)
-    { x:140, y:545, w:220, h:150 },
-    { x:400, y:545, w:220, h:150 },
-    { x:660, y:545, w:220, h:150 },
-    { x:920, y:545, w:220, h:150 },
+  bins  : [                                            // 카테고리 순서대로 매핑 (벨트 아래 3개)
+    { x:60,  y:412, w:268, h:205 },
+    { x:506, y:412, w:268, h:205 },
+    { x:952, y:436, w:268, h:205 },
   ],
 };
 
@@ -156,31 +145,27 @@ const CONFIG = {
   duration: 90,                                       // 라운드 제한 시간(초)
   speedStart: 75,  speedRamp: 1.7,  speedMax: 225,    // 벨트 속도 px/s
   spawnStart: 2.6, spawnMin: 1.2,   spawnRamp: 0.016, // 생성 간격(초)
-  trapChance: 0.25, trapGraceSec: 9,                  // 함정 비율·초반 유예
+  trashChance: 0.3, trashGraceSec: 9,                 // 버릴 단어 비율·초반 유예
   throwMinSpeed: 540, gravity: 2700,                  // 던지기 판정·중력
   comboMax: 5,
 };
 
-// ── 단어 데이터 (임시 — 추후 전달분으로 교체) ──
+// ── 단어 데이터 ──
 const CATEGORIES = [
-  { id:'fruit',  label:'FRUIT',  c:'#f6c945', d:'#a87f14',
-    words:['apple','banana','grape','orange','peach','lemon','cherry','melon'] },
-  { id:'animal', label:'ANIMAL', c:'#7ec850', d:'#487c24',
-    words:['dog','cat','lion','horse','rabbit','tiger','panda','sheep'] },
-  { id:'color',  label:'COLOR',  c:'#b07ce8', d:'#6f3fa8',
-    words:['red','blue','green','pink','purple','brown','black','yellow'] },
-  { id:'school', label:'SCHOOL', c:'#f08a4b', d:'#a8501a',
-    words:['book','pencil','desk','chair','eraser','ruler','paper','crayon'] },
+  { id:'looking',   short:'LOOKING',   img:'assets/box_looking.png',   c:'#e8a33d', d:'#a8501a',
+    words:['glanced','looked','noticed','spotted','stared','peeked','gazed'] },
+  { id:'gathering', short:'GATHERING', img:'assets/box_gathering.png', c:'#7ec850', d:'#487c24',
+    words:['piled','loaded','dumped','stored','gathered','collected','stacked'] },
+  { id:'mixing',    short:'MIXING',    img:'assets/box_mixing.png',    c:'#b07ce8', d:'#6f3fa8',
+    words:['blended','mixed','joined','combined','united','merged','fused'] },
 ];
-const TRAPS = [   // bad: 표기 오류 단어(건드리지 않고 TRASH로 보내야 함), good: 올바른 철자
-  { bad:'aple',    good:'apple'  }, { bad:'bananna', good:'banana' },
-  { bad:'orenge',  good:'orange' }, { bad:'cherri',  good:'cherry' },
-  { bad:'tigar',   good:'tiger'  }, { bad:'rabit',   good:'rabbit' },
-  { bad:'shepe',   good:'sheep'  }, { bad:'gren',    good:'green'  },
-  { bad:'yelow',   good:'yellow' }, { bad:'purpel',  good:'purple' },
-  { bad:'pancil',  good:'pencil' }, { bad:'chare',   good:'chair'  },
-  { bad:'erasor',  good:'eraser' }, { bad:'bok',     good:'book'   },
+const TRASH_WORDS = [   // 어느 박스에도 안 맞는 단어 — 건드리지 않고 TRASH로
+  'necessary','needed','key','basic','important','required','vital',
+  'exist','be','live','stay','last','remain','survive',
 ];
+const FRUITS = [        // 벨트에 흐르는 과일 (단어와 무관, 랜덤)
+  'apple','banana','strawberry','peach','grape','blueberry','kiwi','mango','coconut',
+].map(n => `assets/fruit_${n}.png`);
 
 /* ===================== 이하 엔진 ===================== */
 
@@ -211,8 +196,7 @@ addEventListener('resize', resize); resize();
     const r = LAYOUT.bins[i];
     const el = document.createElement('div');
     el.className = 'bin'; el.dataset.cat = cat.id;
-    el.style.cssText = `left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;--c:${cat.c};--d:${cat.d};`;
-    el.innerHTML = `<div class="flap"></div><div class="tape"></div><div class="label">${cat.label}</div>`;
+    el.style.cssText = `left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;background-image:url('${cat.img}');`;
     binsEl.appendChild(el);
     cat.el = el; cat.rect = r;
   });
@@ -319,15 +303,15 @@ const beltY = LAYOUT.belt.itemY;
 function beltSpeed(){ return Math.min(CONFIG.speedMax, CONFIG.speedStart + tPlay*CONFIG.speedRamp); }
 function spawnGap(){ return Math.max(CONFIG.spawnMin, CONFIG.spawnStart - tPlay*CONFIG.spawnRamp); }
 
-// ── 단어 생성 ──
+// ── 아이템 생성: 랜덤 과일 + 랜덤 단어 라벨 ──
 function spawnItem(){
   const active = new Set(items.map(i=>i.word));
-  let word=null, cat=null, fix=null;
+  let word=null, cat=null;
   for (let tries=0; tries<24 && word===null; tries++){
-    const isTrap = tPlay > CONFIG.trapGraceSec && Math.random() < CONFIG.trapChance;
-    if (isTrap){
-      const tr = TRAPS[(Math.random()*TRAPS.length)|0];
-      if (!active.has(tr.bad)){ word = tr.bad; fix = tr.good; cat = null; }
+    const isTrash = tPlay > CONFIG.trashGraceSec && Math.random() < CONFIG.trashChance;
+    if (isTrash){
+      const w = TRASH_WORDS[(Math.random()*TRASH_WORDS.length)|0];
+      if (!active.has(w)){ word = w; cat = null; }
     } else {
       const c = CATEGORIES[(Math.random()*CATEGORIES.length)|0];
       const w = c.words[(Math.random()*c.words.length)|0];
@@ -336,9 +320,16 @@ function spawnItem(){
   }
   if (word === null) return;
   const el = document.createElement('div');
-  el.className = 'item'; el.textContent = word;
+  el.className = 'item';
+  const img = document.createElement('img');
+  img.className = 'fruit'; img.draggable = false;
+  img.src = FRUITS[(Math.random()*FRUITS.length)|0];
+  img.onerror = ()=> img.remove();                  // 과일 에셋 없으면 라벨만 표시
+  const lab = document.createElement('div');
+  lab.className = 'wlabel'; lab.textContent = word;
+  el.appendChild(img); el.appendChild(lab);
   itemsEl.appendChild(el);
-  const it = { el, word, cat, fix, trap:!!fix,
+  const it = { el, word, cat, trash:cat===null,
     x:LAYOUT.belt.spawnX, y:beltY, py:beltY, vx:0, vy:0, rot:rand(-3,3),
     mode:'belt', bob:rand(0,6.28), spawnT:0, squash:0,
     grabDX:0, grabDY:0, tw:null, fade:1 };
@@ -358,7 +349,7 @@ function grabItem(e, it){
   const p = toDesign(e);
   pointer.x = p.x; pointer.y = p.y;
   drag = it; it.mode = 'drag'; it.vx = 0; it.vy = 0; it.tw = null;
-  it.grabDX = clamp(it.x - p.x, -60, 60); it.grabDY = clamp(it.y - p.y, -30, 30);
+  it.grabDX = clamp(it.x - p.x, -60, 60); it.grabDY = clamp(it.y - p.y, -60, 60);
   it.el.classList.add('drag');
   SFX.pickup();
 }
@@ -392,11 +383,11 @@ function hitTarget(it){
 }
 function inTrash(it){ return inRect(it.x, it.y, LAYOUT.trash, 0); }
 function resolveDrop(it, t){
-  if (!it.trap && it.cat === t.cat.id) successBin(it, t.cat);
-  else if (it.trap) failDrop(it, t.cat.el, `FAKE! → TRASH`);
+  if (!it.trash && it.cat === t.cat.id) successBin(it, t.cat);
+  else if (it.trash) failDrop(it, t.cat.el, `TRASH!`);
   else {
     const real = CATEGORIES.find(c=>c.id===it.cat);
-    failDrop(it, t.cat.el, `${real.label}!`);
+    failDrop(it, t.cat.el, `${real.short}!`);
   }
 }
 function addScore(n){
@@ -414,19 +405,19 @@ function resetCombo(){ combo = 1; comboEl.textContent = ''; }
 function successBin(it, cat){
   const r = cat.rect, cx = r.x+r.w/2;
   addScore(100*combo);
-  floater(cx, r.y-46, `+${100*combo}`, cat.d);
+  floater(cx, r.y-36, `+${100*combo}`, cat.d);
   bumpCombo();
   cat.el.classList.remove('pop'); void cat.el.offsetWidth; cat.el.classList.add('pop');
-  burst(cx, r.y+10, [cat.c, '#ffffff', cat.d], 18, { up:260, spMin:80, spMax:330 });
+  burst(cx, r.y+40, [cat.c, '#ffffff', cat.d], 18, { up:260, spMin:80, spMax:330 });
   SFX.correct();
-  startResolve(it, cx, r.y+34);
+  startResolve(it, cx, r.y+90);
 }
-// 우측 끝 자동 낙하 / 통에 직접 투하 — 함정이면 정답, 진짜 단어면 MISS
+// 우측 끝 자동 낙하 / 통에 직접 투하 — 버릴 단어면 정답, 박스 단어면 MISS
 function trashResolve(it){
   const T = LAYOUT.trash;
-  if (it.trap){
+  if (it.trash){
     addScore(150*combo);
-    floater(T.cx, T.y-36, `+${150*combo}  FAKE! (${it.fix})`, '#3f8f2f', 25);
+    floater(T.cx, T.y-36, `+${150*combo}  (${it.word})`, '#3f8f2f', 25);
     bumpCombo();
     burst(T.cx, T.y+24, ['#8b93a8','#c8cdd8','#3f8f2f'], 12, { up:200, spMin:60, spMax:220 });
     SFX.trash();
@@ -444,7 +435,7 @@ function failDrop(it, flashEl, msg){
   flashEl.classList.remove('wrong'); void flashEl.offsetWidth; flashEl.classList.add('wrong');
   scene.classList.remove('shake'); void scene.offsetWidth; scene.classList.add('shake');
   burst(it.x, it.y, ['#ff5252','#ff8a65'], 12, { up:140, spMin:60, spMax:260 });
-  floater(it.x+40, it.y-50, msg, '#d61f1f', 26);
+  floater(it.x+40, it.y-60, msg, '#d61f1f', 26);
   SFX.wrong();
   loseLife();
   if (state === 'playing') startReturn(it);
@@ -551,7 +542,7 @@ function update(dt){
       // 위에서 떨어지며 벨트 라인을 통과하면 벨트 위로 착지
       if (it.vy > 0 && it.py <= beltY && it.y >= beltY && it.x > 10 && it.x < LAYOUT.belt.xEnd-20){
         it.y = beltY; it.mode = 'belt'; it.squash = 1;
-        dust(it.x, beltY+26); SFX.drop();
+        dust(it.x, beltY+60); SFX.drop();
       } else if (it.x < -90 || it.x > 1380 || it.y > 800){
         removeItem(it);
         floater(clamp(it.x, 80, 1200), 660, 'DROPPED!', '#d61f1f', 26);
@@ -599,12 +590,12 @@ function showMenu(){
   overlayEl.innerHTML = `
     <div class="card">
       <h1>WORD FACTORY</h1>
-      <p>Words ride the conveyor belt!<br>
-        <b>Drag</b> each word into its <b>category box</b> below.</p>
-      <p style="color:#3f8f2f"><b>Misspelled words</b> are fakes — <b>don't touch them!</b><br>
+      <p>Fruit with word tags rides the conveyor belt!<br>
+        <b>Drag</b> each word into its box — <b>Looking</b> · <b>Gathering</b> · <b>Mixing</b>.</p>
+      <p style="color:#3f8f2f">Some words fit <b>no box</b> — <b>don't touch them!</b><br>
         Let them ride into the <b>TRASH</b> at the end.</p>
-      <p class="small">Real words that fall in the trash cost a life.
-        You have <b>${CONFIG.duration} seconds</b> and ${CONFIG.lives} lives. You can throw words too!</p>
+      <p class="small">Box words that fall in the trash cost a life.
+        You have <b>${CONFIG.duration} seconds</b> and ${CONFIG.lives} lives. You can throw too!</p>
       <button class="btn" id="startBtn">START</button>
     </div>`;
   $('startBtn').addEventListener('click', startGame);
