@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Word Factory</title>
+<title>Coupang</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Caveat:wght@600;700&family=DM+Sans:opsz,wght@9..40,600;9..40,800;9..40,900&family=Patrick+Hand&display=swap" rel="stylesheet">
 <style>
@@ -97,13 +97,11 @@
   .hud-side { display:flex; align-items:center; gap:12px; min-width:330px; }
   .hud-side.right { justify-content:flex-end; }
   #factorySign { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-    min-width:260px; padding:10px 38px 11px; text-align:center;
+    width:328px; height:82px; display:flex; align-items:center; justify-content:center; padding:0 38px; text-align:center;
     background:linear-gradient(#c87918,#a96012); border-radius:8px;
     box-shadow:0 6px 0 #73400e, 0 14px 22px #00000030, inset 0 0 0 2px #ffffff24; }
-  #factorySign .t1 { font-family:'Caveat',cursive; font-size:18px; line-height:.9;
-    color:#ffe0b7; letter-spacing:.06em; }
-  #factorySign .t2 { font-size:27px; line-height:1; font-weight:900; color:#fff6e8;
-    letter-spacing:.06em; text-shadow:0 2px 0 #00000030; }
+  #factorySign img { width:232px; height:auto; display:block;
+    filter:drop-shadow(0 2px 0 #fff4d030) drop-shadow(0 3px 2px #0000002d); }
   .hud-pill { min-height:52px; display:flex; align-items:center; gap:10px; justify-content:center;
     padding:8px 16px; border-radius:12px; background:#262019; color:#fff3d8;
     box-shadow:0 5px 0 #00000042, 0 14px 22px #00000030, inset 0 0 0 2px #ffe09628; }
@@ -198,7 +196,7 @@
         <div class="hud-side left">
           <div class="hud-pill life-pill"><small>LIFE</small><div id="hearts"></div></div>
         </div>
-        <div id="factorySign"><div class="t1">WORD</div><div class="t2">FACTORY</div></div>
+        <div id="factorySign"><img src="assets/coupang_logo.png" alt="Coupang"></div>
         <div class="hud-side right">
           <div class="hud-pill timer-pill"><small>TIME</small><div id="timer">90</div></div>
           <div class="hud-pill score-pill"><small>SCORE</small><div id="scoreBox"><div id="score">0</div><div id="combo"></div></div></div>
@@ -214,7 +212,7 @@
 <script>
 'use strict';
 /* =====================================================================
-   WORD FACTORY — 컨베이어 단어 분류 게임 (배경: assets/bg.png)
+   COUPANG — 컨베이어 단어 분류 게임 (배경: assets/bg.png)
    벨트 좌→우. 과일에 단어 라벨이 매달려 흐름.
    3개 박스(Looking/Gathering/Mixing)에 분류, 어디에도 안 맞는 단어는
    건드리지 않고 우측 끝 TRASH로 흘려보내야 정답.
@@ -366,6 +364,10 @@ function initAudio(){
   const lp = AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value = 110;
   const g = AC.createGain(); g.gain.value = 0.05;
   src.connect(lp); lp.connect(g); g.connect(master); src.start();
+}
+function unlockAudio(){
+  initAudio();
+  if (AC && AC.state === 'suspended') AC.resume().catch(()=>{});
 }
 function tone(freq, dur, type='sine', vol=0.2, slideTo=null, delay=0){
   if (!AC) return;
@@ -772,7 +774,7 @@ function showMenu(){
   overlayEl.classList.remove('hidden');
   overlayEl.innerHTML = `
     <div class="card start-card">
-      <h1>WORD FACTORY</h1>
+      <h1>COUPANG</h1>
       <p>Fruit with word tags rides the conveyor belt!<br>
         <b>Drag</b> each word into its box — <b>Looking</b> · <b>Gathering</b> · <b>Mixing</b>.</p>
       <p style="color:#3f8f2f">Some words fit <b>no box</b> — <b>don't touch them!</b><br>
@@ -784,8 +786,7 @@ function showMenu(){
   $('startBtn').addEventListener('click', startGame);
 }
 function startGame(){
-  initAudio();
-  if (AC && AC.state === 'suspended') AC.resume();
+  unlockAudio();
   if (lifeCueTimer){ clearTimeout(lifeCueTimer); lifeCueTimer = null; }
   lifeCueEl.classList.remove('on');
   overlayEl.classList.remove('game-over-layout');
@@ -807,8 +808,8 @@ function gameOver(reason){
   if (drag){ drag.el.classList.remove('drag'); drag = null; }
   const timeUp = reason === 'time';
   if (timeUp) SFX.timeup();
-  const best = Math.max(score, +(localStorage.getItem('wordFactoryBest')||0));
-  localStorage.setItem('wordFactoryBest', best);
+  const best = Math.max(score, +(localStorage.getItem('coupangBest')||0));
+  localStorage.setItem('coupangBest', best);
   setTimeout(()=>{
     overlayEl.classList.remove('hidden');
     overlayEl.classList.toggle('game-over-layout', !timeUp);
@@ -834,9 +835,10 @@ function gameOver(reason){
   }, 700);
 }
 
+addEventListener('pointerdown', unlockAudio, { once:true, capture:true });
+addEventListener('keydown', unlockAudio, { once:true });
 buildHearts(); updateHearts();
-showMenu();
-if (location.hash === '#autostart') startGame();   // 스크린샷 테스트용
+startGame();
 requestAnimationFrame(frame);
 </script>
 </body>
