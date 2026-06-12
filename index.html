@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Word Factory</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Patrick+Hand&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Caveat:wght@600;700&family=DM+Sans:opsz,wght@9..40,600;9..40,800;9..40,900&family=Patrick+Hand&display=swap" rel="stylesheet">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body { width:100%; height:100%; overflow:hidden; background:#2b2a26; touch-action:none;
@@ -37,18 +37,48 @@
     0%,100% { transform:translateX(0); filter:drop-shadow(0 0 10px #ff3b3b); }
     25% { transform:translateX(-10px); } 50% { transform:translateX(9px); } 75% { transform:translateX(-6px); }
   }
+  .stored-fruit { position:absolute; width:40px; height:40px; object-fit:contain; pointer-events:none;
+    z-index:2; filter:drop-shadow(0 5px 3px #00000035);
+    transform:translate(-50%,-50%) rotate(var(--rot, 0deg)) scale(.18);
+    animation:fruitStore .28s cubic-bezier(.2,1.35,.34,1) forwards; }
+  @keyframes fruitStore {
+    0% { opacity:0; transform:translate(-50%,-50%) translateY(-22px) rotate(var(--rot, 0deg)) scale(.18); }
+    100% { opacity:1; transform:translate(-50%,-50%) rotate(var(--rot, 0deg)) scale(var(--s, 1)); }
+  }
 
   /* ── 아이템: 과일 + 단어 라벨 ── */
   .item { position:absolute; left:0; top:0; z-index:30; cursor:grab; will-change:transform;
-    display:flex; flex-direction:column; align-items:center; gap:1px; }
-  .item .fruit { width:94px; height:94px; object-fit:contain; pointer-events:none;
-    filter:drop-shadow(0 6px 6px #00000030); }
-  .item .wlabel { background:#fdf8ec; border:3px solid #2b2b2b; border-radius:9px;
-    padding:1px 13px; font-family:'Patrick Hand','Comic Sans MS',sans-serif; font-size:27px;
-    color:#2b2b2b; white-space:nowrap; pointer-events:none;
-    box-shadow:0 3px 0 #00000022; }
+    width:158px; height:158px; }
+  .item .fruit { position:absolute; left:50%; top:50%; width:128px; height:128px;
+    transform:translate(-50%,-50%); object-fit:contain; pointer-events:none;
+    filter:drop-shadow(0 8px 8px #00000036); }
+  .item .wlabel { position:absolute; left:50%; top:72%; z-index:2;
+    transform:translate(-50%,-50%); min-width:88px; max-width:132px;
+    background:#fdf8ecd9; border:3px solid #2b2b2b; border-radius:14px;
+    padding:0 13px; font-family:'Patrick Hand','Comic Sans MS',sans-serif; font-size:28px;
+    line-height:1.16; color:#2b2b2b; white-space:nowrap; pointer-events:none;
+    text-align:center; box-shadow:0 3px 0 #00000022; overflow:hidden; text-overflow:ellipsis; }
+  .item .wlabel.long { font-size:24px; }
+  .item.fruit-banana .wlabel {
+    top:62%; left:52%; width:132px; max-width:132px; min-width:132px;
+    transform:translate(-50%,-50%) rotate(-17deg);
+    border-radius:18px 12px 18px 12px; font-size:25px; padding:0 10px;
+  }
+  .item.fruit-banana .wlabel.long { font-size:21px; }
+  .item.fruit-strawberry .wlabel,
+  .item.fruit-apple .wlabel,
+  .item.fruit-peach .wlabel,
+  .item.fruit-blueberry .wlabel,
+  .item.fruit-kiwi .wlabel,
+  .item.fruit-coconut .wlabel,
+  .item.fruit-grape .wlabel,
+  .item.fruit-mango .wlabel {
+    top:68%; width:122px; max-width:122px; min-width:104px;
+    border-radius:18px; background:#fdf8eccf;
+  }
   .item.drag { cursor:grabbing; z-index:50; }
   .item.drag .fruit { filter:drop-shadow(0 18px 16px #00000038); }
+  .item.storing .wlabel { display:none; }
 
   /* ── 이펙트 캔버스 / 플로터 ── */
   #fx { position:absolute; inset:0; z-index:60; pointer-events:none; }
@@ -58,44 +88,67 @@
   @keyframes floatUp { 0% { opacity:0; margin-top:8px; } 12% { opacity:1; margin-top:0; }
     100% { opacity:0; margin-top:-78px; } }
 
-  /* ── HUD (하단 띠) ── */
-  #hud { position:absolute; inset:0; z-index:70; pointer-events:none; }
-  #hearts { position:absolute; left:40px; top:660px; display:flex; gap:8px; }
-  .heart { width:32px; height:30px; position:relative; transition:filter .2s, transform .2s;
-    filter:drop-shadow(0 2px 0 #2b2b2b55); }
-  .heart::before, .heart::after { content:''; position:absolute; width:18px; height:28px;
-    background:#e8556d; border-radius:10px 10px 0 0; top:0; }
-  .heart::before { left:8px; transform:rotate(-45deg); transform-origin:0 100%; }
-  .heart::after { left:-2px; transform:rotate(45deg); transform-origin:100% 100%; }
-  .heart.off { filter:grayscale(1) brightness(.45); transform:scale(.82); }
-  #scoreBox { position:absolute; right:46px; top:628px; text-align:right; }
-  #score { font-size:44px; font-weight:800; color:#2b2b2b; text-shadow:0 2px 0 #ffffff80; }
+  /* ── HUD (상단 바) ── */
+  #hud { position:absolute; inset:0; z-index:70; pointer-events:none;
+    font-family:'DM Sans','Baloo 2','Segoe UI',sans-serif; }
+  #topBar { position:absolute; left:22px; right:22px; top:20px; height:62px;
+    display:flex; align-items:center; justify-content:space-between; padding:0; }
+  .hud-side { display:flex; align-items:center; gap:12px; min-width:330px; }
+  .hud-side.right { justify-content:flex-end; }
+  #factorySign { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    min-width:260px; padding:10px 38px 11px; text-align:center;
+    background:linear-gradient(#c87918,#a96012); border-radius:8px;
+    box-shadow:0 6px 0 #73400e, 0 14px 22px #00000030, inset 0 0 0 2px #ffffff24; }
+  #factorySign .t1 { font-family:'Caveat',cursive; font-size:18px; line-height:.9;
+    color:#ffe0b7; letter-spacing:.06em; }
+  #factorySign .t2 { font-size:27px; line-height:1; font-weight:900; color:#fff6e8;
+    letter-spacing:.06em; text-shadow:0 2px 0 #00000030; }
+  .hud-pill { min-height:52px; display:flex; align-items:center; gap:10px; justify-content:center;
+    padding:8px 16px; border-radius:12px; background:#262019; color:#fff3d8;
+    box-shadow:0 5px 0 #00000042, 0 14px 22px #00000030, inset 0 0 0 2px #ffe09628; }
+  .hud-pill small { font-size:10px; font-weight:900; letter-spacing:.12em; color:#c8b089; line-height:1; }
+  .life-pill { min-width:172px; justify-content:flex-start; }
+  .timer-pill { min-width:118px; }
+  .score-pill { min-width:156px; justify-content:flex-start; }
+  #hearts { display:flex; gap:6px; align-items:center; }
+  .heart { width:25px; height:23px; display:block; overflow:visible;
+    transition:filter .2s, transform .2s, opacity .2s;
+    filter:drop-shadow(0 2px 0 #00000060); }
+  .heart path { fill:#ff6b86; stroke:#ff9aae; stroke-width:1.5; }
+  .heart.off { filter:drop-shadow(0 2px 0 #00000060); transform:scale(.92); opacity:.9; }
+  .heart.off path { fill:#34302a; stroke:#4b443b; }
+  #scoreBox { position:relative; text-align:left; min-width:48px; height:24px; }
+  #score { font-size:24px; line-height:24px; font-weight:900; color:#fff6e8; text-shadow:0 2px 0 #00000045; }
   #score.punch { animation:scorePunch .25s ease; }
   @keyframes scorePunch { 40% { transform:scale(1.22); } 100% { transform:scale(1); } }
-  #combo { font-size:22px; font-weight:800; color:#c8780f; min-height:28px; text-shadow:0 2px 0 #ffffff80; }
-  #timer { position:absolute; left:50%; top:644px; transform:translateX(-50%);
-    font-size:38px; font-weight:800; color:#2b2b2b;
-    background:#ffd94e; border:3px solid #2b2b2b; border-radius:10px; padding:0 22px;
-    box-shadow:0 4px 0 #00000026; }
+  #combo { position:absolute; left:0; top:28px; font-size:11px; font-weight:900; color:#ffd469;
+    min-height:0; line-height:1.1; letter-spacing:.05em; white-space:nowrap; }
+  #timer { min-width:52px; text-align:center; font-size:24px; line-height:1; font-weight:900;
+    color:#fff6e8; text-shadow:0 2px 0 #00000045; }
   #timer.low { color:#d61f1f; animation:timerPulse 1s ease infinite; }
-  @keyframes timerPulse { 0%,100% { transform:translateX(-50%) scale(1); } 50% { transform:translateX(-50%) scale(1.16); } }
+  @keyframes timerPulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.16); } }
 
   /* ── 오버레이 ── */
   #overlay { position:absolute; inset:0; z-index:100; display:flex; align-items:center; justify-content:center;
-    background:#2b2a26d6; backdrop-filter:blur(3px); }
+    background:rgba(28,18,12,.62); backdrop-filter:blur(5px); }
   #overlay.hidden { display:none; }
-  .card { background:linear-gradient(#faf2dc,#f0e3c2); border:4px solid #2b2b2b; border-radius:18px;
-    padding:40px 60px; text-align:center; color:#41382b; box-shadow:0 16px 50px #00000066; max-width:780px; }
-  .card h1 { font-size:52px; letter-spacing:5px; color:#c8780f; margin-bottom:18px; text-shadow:0 3px 0 #ffffff80; }
-  .card p { font-size:21px; line-height:1.65; margin-bottom:10px; color:#5a4d38; }
-  .card .small { font-size:17px; color:#8a7a5e; }
-  .card .big { font-size:40px; font-weight:800; color:#2b2b2b; margin:10px 0 4px; }
-  .btn { margin-top:24px; padding:14px 60px; font-size:26px; font-weight:800; letter-spacing:2px;
-    font-family:inherit; color:#3a2d12; background:linear-gradient(#ffd94e,#f0b929);
-    border:4px solid #2b2b2b; border-radius:14px;
-    cursor:pointer; box-shadow:0 6px 0 #2b2b2b, 0 12px 22px #00000033; transition:transform .08s, box-shadow .08s; }
-  .btn:hover { transform:translateY(-2px); }
-  .btn:active { transform:translateY(4px); box-shadow:0 2px 0 #2b2b2b; }
+  .card { width:760px; max-width:92%; background:linear-gradient(#fffaf0,#f7ead6);
+    border-radius:22px; padding:42px 54px 40px; text-align:center; color:#41382b;
+    box-shadow:0 14px 0 #5a283859, 0 40px 90px #00000080, inset 0 0 0 3px #ffffffb3; }
+  .card.start-card { width:920px; }
+  .card.result-card { width:560px; }
+  .card h1 { font-size:58px; line-height:1; letter-spacing:9px; color:#c8780f;
+    margin-bottom:26px; text-shadow:0 5px 0 #fff4d0; font-weight:900; }
+  .card p { font-size:21px; line-height:1.55; margin-bottom:12px; color:#5f4d3e; font-weight:800; }
+  .card .small { font-size:17px; line-height:1.55; color:#8a7a5e; font-weight:900; }
+  .card .big { font-size:46px; line-height:1; font-weight:900; color:#2b2b2b; margin:12px 0 14px; }
+  .btn { margin-top:28px; padding:15px 58px; font-size:24px; font-weight:900; letter-spacing:5px;
+    font-family:'DM Sans','Baloo 2',sans-serif; color:#fff6e8;
+    background:linear-gradient(#ff8a73,#d95d50); border:0; border-radius:14px;
+    cursor:pointer; box-shadow:0 7px 0 #8e3328, 0 18px 28px #0000002d, inset 0 2px 0 #ffffff66;
+    transition:transform .08s, box-shadow .08s, filter .12s; }
+  .btn:hover { filter:brightness(1.07); }
+  .btn:active { transform:translateY(4px); box-shadow:0 3px 0 #8e3328, 0 10px 18px #00000024; }
 </style>
 </head>
 <body>
@@ -107,9 +160,16 @@
     <canvas id="fx" width="1280" height="720"></canvas>
 
     <div id="hud">
-      <div id="hearts"></div>
-      <div id="timer"></div>
-      <div id="scoreBox"><div id="score">0</div><div id="combo"></div></div>
+      <div id="topBar">
+        <div class="hud-side left">
+          <div class="hud-pill life-pill"><small>LIFE</small><div id="hearts"></div></div>
+        </div>
+        <div id="factorySign"><div class="t1">WORD</div><div class="t2">FACTORY</div></div>
+        <div class="hud-side right">
+          <div class="hud-pill timer-pill"><small>TIME</small><div id="timer">90</div></div>
+          <div class="hud-pill score-pill"><small>SCORE</small><div id="scoreBox"><div id="score">0</div><div id="combo"></div></div></div>
+        </div>
+      </div>
     </div>
 
     <div id="overlay"></div>
@@ -129,9 +189,9 @@
 // ── 레이아웃 좌표 (1280x720 디자인 기준, bg.png에 맞춤) ──
 const LAYOUT = {
   stage : { w:1280, h:720 },
-  belt  : { spawnX:-70, xEnd:977, itemY:158,           // 좌측 스폰 → 우측 끝, itemY=아이템 중심
-            face:{ x:0, y:93, w:977, h:140 } },        // 구동 연출 오버레이 영역
-  trash : { x:1005, y:170, w:255, h:212, catchY:285, cx:1132 },  // 자동 낙하 수거 영역
+  belt  : { spawnX:-100, xEnd:1018, itemY:205,          // 좌측 스폰 → 우측 끝, itemY=아이템 중심
+            face:{ x:0, y:106, w:1032, h:192 } },       // 구동 연출 오버레이 영역
+  trash : { x:1005, y:145, w:255, h:300, catchY:342, cx:1140 },  // 자동 낙하 수거 영역
   bins  : [                                            // 카테고리 순서대로 매핑 (벨트 아래 3개)
     { x:60,  y:412, w:268, h:205 },
     { x:506, y:412, w:268, h:205 },
@@ -163,9 +223,17 @@ const TRASH_WORDS = [   // 어느 박스에도 안 맞는 단어 — 건드리�
   'necessary','needed','key','basic','important','required','vital',
   'exist','be','live','stay','last','remain','survive',
 ];
-const FRUITS = [        // 벨트에 흐르는 과일 (단어와 무관, 랜덤)
+const FRUIT_NAMES = [   // 벨트에 흐르는 과일 (단어와 무관, 랜덤)
   'apple','banana','strawberry','peach','grape','blueberry','kiwi','mango','coconut',
-].map(n => `assets/fruit_${n}.png`);
+];
+const FRUITS = FRUIT_NAMES.map(name => ({ name, src:`assets/fruit_${name}.png` }));
+const BIN_STACK_SLOTS = [
+  { x:.41, y:.56, s:.94, rot:-11 }, { x:.52, y:.55, s:1.00, rot:5 },
+  { x:.63, y:.57, s:.95, rot:13 },  { x:.46, y:.49, s:.88, rot:8 },
+  { x:.58, y:.48, s:.90, rot:-8 },  { x:.68, y:.50, s:.86, rot:6 },
+  { x:.36, y:.50, s:.82, rot:17 },  { x:.50, y:.42, s:.80, rot:-14 },
+  { x:.61, y:.42, s:.82, rot:12 },  { x:.72, y:.45, s:.76, rot:-5 },
+];
 
 /* ===================== 이하 엔진 ===================== */
 
@@ -198,9 +266,34 @@ addEventListener('resize', resize); resize();
     el.className = 'bin'; el.dataset.cat = cat.id;
     el.style.cssText = `left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;background-image:url('${cat.img}');`;
     binsEl.appendChild(el);
-    cat.el = el; cat.rect = r;
+    cat.el = el; cat.rect = r; cat.stack = 0; cat.storedFruits = [];
   });
 })();
+
+function addStoredFruit(cat, src){
+  const slot = BIN_STACK_SLOTS[cat.stack % BIN_STACK_SLOTS.length];
+  const layer = Math.floor(cat.stack / BIN_STACK_SLOTS.length);
+  const img = document.createElement('img');
+  img.className = 'stored-fruit';
+  img.draggable = false;
+  img.src = src;
+  img.style.left = `calc(${slot.x * 100}% + ${rand(-5, 5)}px)`;
+  img.style.top = `calc(${slot.y * 100}% - ${Math.min(layer * 5, 18)}px)`;
+  img.style.zIndex = 2 + cat.stack;
+  img.style.setProperty('--rot', `${slot.rot + rand(-5, 5)}deg`);
+  img.style.setProperty('--s', `${slot.s}`);
+  cat.el.appendChild(img);
+  cat.storedFruits.push(img);
+  cat.stack++;
+  if (cat.storedFruits.length > 18) cat.storedFruits.shift().remove();
+}
+function clearStoredFruits(){
+  CATEGORIES.forEach(cat => {
+    cat.stack = 0;
+    cat.storedFruits.forEach(el => el.remove());
+    cat.storedFruits = [];
+  });
+}
 
 // ── 사운드 (WebAudio 합성) ──
 let AC = null, master = null;
@@ -319,17 +412,20 @@ function spawnItem(){
     }
   }
   if (word === null) return;
+  const fruit = FRUITS[(Math.random()*FRUITS.length)|0];
   const el = document.createElement('div');
-  el.className = 'item';
+  el.className = `item fruit-${fruit.name}`;
   const img = document.createElement('img');
   img.className = 'fruit'; img.draggable = false;
-  img.src = FRUITS[(Math.random()*FRUITS.length)|0];
+  img.src = fruit.src;
   img.onerror = ()=> img.remove();                  // 과일 에셋 없으면 라벨만 표시
   const lab = document.createElement('div');
   lab.className = 'wlabel'; lab.textContent = word;
+  if (word.length >= 8) lab.classList.add('long');
   el.appendChild(img); el.appendChild(lab);
   itemsEl.appendChild(el);
   const it = { el, word, cat, trash:cat===null,
+    fruitSrc:fruit.src, fruitName:fruit.name,
     x:LAYOUT.belt.spawnX, y:beltY, py:beltY, vx:0, vy:0, rot:rand(-3,3),
     mode:'belt', bob:rand(0,6.28), spawnT:0, squash:0,
     grabDX:0, grabDY:0, tw:null, fade:1 };
@@ -404,6 +500,8 @@ function resetCombo(){ combo = 1; comboEl.textContent = ''; }
 
 function successBin(it, cat){
   const r = cat.rect, cx = r.x+r.w/2;
+  it.el.classList.add('storing');
+  addStoredFruit(cat, it.fruitSrc);
   addScore(100*combo);
   floater(cx, r.y-36, `+${100*combo}`, cat.d);
   bumpCombo();
@@ -437,8 +535,10 @@ function failDrop(it, flashEl, msg){
   burst(it.x, it.y, ['#ff5252','#ff8a65'], 12, { up:140, spMin:60, spMax:260 });
   floater(it.x+40, it.y-60, msg, '#d61f1f', 26);
   SFX.wrong();
+  if (drag === it){ drag = null; it.el.classList.remove('drag'); }
+  if (lives <= 1) removeItem(it);
+  else startResolve(it, it.x, it.y+34);
   loseLife();
-  if (state === 'playing') startReturn(it);
 }
 function loseLife(){
   lives--; resetCombo(); updateHearts();
@@ -467,7 +567,14 @@ function updateHearts(){
 function buildHearts(){
   heartsEl.innerHTML = '';
   for (let i=0; i<CONFIG.lives; i++){
-    const h = document.createElement('div'); h.className = 'heart'; heartsEl.appendChild(h);
+    const h = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    h.setAttribute('class', 'heart');
+    h.setAttribute('viewBox', '0 0 32 29');
+    h.setAttribute('aria-hidden', 'true');
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', 'M16 27C9.1 20.8 3 16.5 3 9.5C3 5.7 5.9 3 9.5 3C12 3 14.3 4.3 16 6.5C17.7 4.3 20 3 22.5 3C26.1 3 29 5.7 29 9.5C29 16.5 22.9 20.8 16 27Z');
+    h.appendChild(p);
+    heartsEl.appendChild(h);
   }
 }
 
@@ -588,7 +695,7 @@ function showMenu(){
   state = 'menu';
   overlayEl.classList.remove('hidden');
   overlayEl.innerHTML = `
-    <div class="card">
+    <div class="card start-card">
       <h1>WORD FACTORY</h1>
       <p>Fruit with word tags rides the conveyor belt!<br>
         <b>Drag</b> each word into its box — <b>Looking</b> · <b>Gathering</b> · <b>Mixing</b>.</p>
@@ -604,6 +711,7 @@ function startGame(){
   initAudio();
   if (AC && AC.state === 'suspended') AC.resume();
   for (const it of [...items]) removeItem(it);
+  clearStoredFruits();
   drag = null;
   score = 0; combo = 1; lives = CONFIG.lives; tPlay = 0; spawnTimer = 0.6;
   timeLeft = CONFIG.duration; lastTickSec = -1;
@@ -623,7 +731,7 @@ function gameOver(reason){
   setTimeout(()=>{
     overlayEl.classList.remove('hidden');
     overlayEl.innerHTML = `
-      <div class="card">
+      <div class="card result-card">
         <h1>${timeUp ? 'TIME UP!' : 'GAME OVER'}</h1>
         <p class="small">SCORE</p>
         <div class="big">${score}</div>
