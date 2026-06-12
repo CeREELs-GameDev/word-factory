@@ -37,7 +37,7 @@
     0%,100% { transform:translateX(0); filter:drop-shadow(0 0 10px #ff3b3b); }
     25% { transform:translateX(-10px); } 50% { transform:translateX(9px); } 75% { transform:translateX(-6px); }
   }
-  .stored-fruit { position:absolute; width:40px; height:40px; object-fit:contain; pointer-events:none;
+  .stored-fruit { position:absolute; width:56px; height:56px; object-fit:contain; pointer-events:none;
     z-index:2; filter:drop-shadow(0 5px 3px #00000035);
     transform:translate(-50%,-50%) rotate(var(--rot, 0deg)) scale(.18);
     animation:fruitStore .28s cubic-bezier(.2,1.35,.34,1) forwards; }
@@ -193,9 +193,9 @@ const LAYOUT = {
             face:{ x:0, y:106, w:1032, h:192 } },       // 구동 연출 오버레이 영역
   trash : { x:1005, y:145, w:255, h:300, catchY:342, cx:1140 },  // 자동 낙하 수거 영역
   bins  : [                                            // 카테고리 순서대로 매핑 (벨트 아래 3개)
-    { x:60,  y:412, w:268, h:205 },
-    { x:506, y:412, w:268, h:205 },
-    { x:952, y:436, w:268, h:205 },
+    { x:50,  y:404, w:395, h:315 },
+    { x:442, y:404, w:398, h:315 },
+    { x:836, y:404, w:398, h:315 },
   ],
 };
 
@@ -228,11 +228,12 @@ const FRUIT_NAMES = [   // 벨트에 흐르는 과일 (단어와 무관, 랜덤)
 ];
 const FRUITS = FRUIT_NAMES.map(name => ({ name, src:`assets/fruit_${name}.png` }));
 const BIN_STACK_SLOTS = [
-  { x:.41, y:.56, s:.94, rot:-11 }, { x:.52, y:.55, s:1.00, rot:5 },
-  { x:.63, y:.57, s:.95, rot:13 },  { x:.46, y:.49, s:.88, rot:8 },
-  { x:.58, y:.48, s:.90, rot:-8 },  { x:.68, y:.50, s:.86, rot:6 },
-  { x:.36, y:.50, s:.82, rot:17 },  { x:.50, y:.42, s:.80, rot:-14 },
-  { x:.61, y:.42, s:.82, rot:12 },  { x:.72, y:.45, s:.76, rot:-5 },
+  { x:.30, y:.49, s:.96, rot:-11 }, { x:.41, y:.48, s:1.02, rot:5 },
+  { x:.52, y:.49, s:.98, rot:13 },  { x:.63, y:.50, s:.95, rot:-8 },
+  { x:.74, y:.51, s:.92, rot:8 },   { x:.35, y:.39, s:.88, rot:17 },
+  { x:.47, y:.38, s:.90, rot:-14 }, { x:.59, y:.39, s:.88, rot:12 },
+  { x:.70, y:.40, s:.84, rot:-5 },  { x:.42, y:.30, s:.80, rot:9 },
+  { x:.54, y:.30, s:.82, rot:-9 },  { x:.66, y:.31, s:.78, rot:14 },
 ];
 
 /* ===================== 이하 엔진 ===================== */
@@ -277,15 +278,15 @@ function addStoredFruit(cat, src){
   img.className = 'stored-fruit';
   img.draggable = false;
   img.src = src;
-  img.style.left = `calc(${slot.x * 100}% + ${rand(-5, 5)}px)`;
-  img.style.top = `calc(${slot.y * 100}% - ${Math.min(layer * 5, 18)}px)`;
+  img.style.left = `calc(${slot.x * 100}% + ${rand(-8, 8)}px)`;
+  img.style.top = `calc(${slot.y * 100}% - ${Math.min(layer * 12, 44)}px)`;
   img.style.zIndex = 2 + cat.stack;
   img.style.setProperty('--rot', `${slot.rot + rand(-5, 5)}deg`);
   img.style.setProperty('--s', `${slot.s}`);
   cat.el.appendChild(img);
   cat.storedFruits.push(img);
   cat.stack++;
-  if (cat.storedFruits.length > 18) cat.storedFruits.shift().remove();
+  if (cat.storedFruits.length > 24) cat.storedFruits.shift().remove();
 }
 function clearStoredFruits(){
   CATEGORIES.forEach(cat => {
